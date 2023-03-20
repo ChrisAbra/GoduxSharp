@@ -7,9 +7,9 @@ public abstract partial class Store : Node
 {
     public State CurrentState { get; protected set; }
     //public Dictionary<Type,Reducer> Reducers = new();
-    private readonly List<State> historicStates = new();
+    protected readonly List<State> historicStates = new();
 
-    public virtual void Dispatch(StoreAction action) 
+    public virtual void Dispatch(StoreAction action)
     {
         historicStates.Add(CurrentState);
         var reducerMethod = action.GetType().GetMethod("Reducer");

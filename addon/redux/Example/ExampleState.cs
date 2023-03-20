@@ -10,7 +10,7 @@ public partial record ExampleState : State
     {
         public string newText;
 
-        public ExampleState Reducer(ExampleState state)
+        public ExampleState Reducer(State state)
         {
             return (ExampleState)state.NewState(nameof(ExampleState.HeaderText), newText);
         }
