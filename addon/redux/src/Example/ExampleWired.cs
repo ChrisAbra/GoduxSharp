@@ -3,15 +3,18 @@ namespace Redux.Example;
 public partial class ExampleWired : Control
 {
     [WireProperty(nameof(ExampleState.HeaderText), "%HeaderText", nameof(Label.Text))]
-    public string HeaderText { get; set; }
+    public string HeaderTextSomethingElse { get; set; }
 
     public override void _Ready()
     {
-        this.ConnectAttributes(ExampleStore.Instance);
+        this.ConnectAttributes(ExampleStore.Instance, (propertyInfo, oldValue,newValue) => {
+            GD.Print(oldValue);
+            GD.Print(newValue);
+            this.SetPropertyValue(propertyInfo,newValue);
+        });
+    }
 
-        GD.Print(ExampleStore.GetCurrentState().HeaderText);
+    public void ChangeText(){
         ExampleStore.Instance.Dispatch(new ExampleState.UpdateHeaderText(){newText = "Newer Text"});
-        GD.Print(ExampleStore.GetCurrentState().HeaderText);
-
     }
 }

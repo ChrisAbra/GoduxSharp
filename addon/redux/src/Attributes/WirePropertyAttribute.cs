@@ -19,47 +19,49 @@ public class WirePropertyAttribute : Attribute
     }
 }
 
-public delegate void HandleAttributesUpdate(PropertyInfo property, object oldValue, object newValue);
-
 public static class WirePropertyNodeExtension
 {
     public static void ConnectAttributes(this Node node, Store store)
     {
-        ConnectAttributes(node, store.CurrentState, (property, oldValue, newValue) => property.SetValue(node, newValue));
+        ConnectAttributes(node, store.CurrentState, (propertyInfo, oldValue, newValue) => {
+            GD.Print(propertyInfo);
+            GD.Print(oldValue);
+            GD.Print(newValue);
+            SetPropertyValue(node,propertyInfo,newValue);
+        });
     }
     public static void ConnectAttributes(this Node node, Store store, HandleAttributesUpdate handleAttributesUpdate)
     {
-        ConnectAttributes(node, store.CurrentState, (property, oldValue, newValue) => handleAttributesUpdate.Invoke(property,oldValue,newValue));
+        ConnectAttributes(node, store.CurrentState, handleAttributesUpdate);
     }
 
-
-    public record WirePropertyAttributeContainer
-    {
-        public PropertyInfo Info;
-        public WirePropertyAttribute Attribute;
-    }
     private static void ConnectAttributes(this Node node, State state, HandleAttributesUpdate handleAttributesUpdate)
     {
         var wiredProperties = from property in node.GetType().GetProperties()
                               let attribute = property.GetCustomAttributes(typeof(WirePropertyAttribute), true)
                               where attribute.Length == 1
-                              select new WirePropertyAttributeContainer { Info = property, Attribute = attribute[0] as WirePropertyAttribute };
+                              select new { Info = property, Attribute = attribute[0] as WirePropertyAttribute };
 
         foreach (var wiredProperty in wiredProperties)
         {
-            SetPropertyFromState(node, wiredProperty, state);
+            SetPropertyFromState(node, wiredProperty.Info, state, wiredProperty.Attribute);
+            state.Subscribe(wiredProperty.Attribute.StatePropertyName, wiredProperty.Info, handleAttributesUpdate);
         }
     }
 
-    private static void SetPropertyFromState(Node node, WirePropertyAttributeContainer wiredProperty, State state)
-    {
-        var attribute = wiredProperty.Attribute;
+    private static void SetPropertyFromState(Node node, PropertyInfo propertyInfo, State state, WirePropertyAttribute attribute){
         var statePropertyName = attribute.StatePropertyName;
         var value = state.GetValue(statePropertyName);
+        node.SetPropertyValue(propertyInfo, value);
+    }
 
-        wiredProperty.Info.SetValue(node, value);
-        if (attribute.NodePath != null && attribute.NodeProperty != null)
-        {
+    public static void SetPropertyValue(this Node node, PropertyInfo propertyInfo, object value){
+        var attribute = propertyInfo.GetCustomAttribute<WirePropertyAttribute>();
+        node.SetPropertyValue(propertyInfo,value,attribute);
+    }
+    private static void SetPropertyValue(this Node node, PropertyInfo propertyInfo, object value, WirePropertyAttribute attribute){
+        propertyInfo.SetValue(node, value);
+        if(attribute.NodePath != null && attribute.NodeProperty != null){
             node.SetNodesWithProperty(attribute.NodePath, attribute.NodeProperty, value);
         }
     }

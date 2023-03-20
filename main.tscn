@@ -44,3 +44,9 @@ grow_vertical = 2
 [node name="Second Page" type="Control" parent="VBoxContainer/TabContainer"]
 visible = false
 layout_mode = 2
+
+[node name="Button" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Change the text to \"Cool guy\""
+
+[connection signal="pressed" from="VBoxContainer/Button" to="." method="ChangeText"]
