@@ -1,6 +1,9 @@
 
+namespace Godux;
+
 [AttributeUsage(AttributeTargets.Property)]
-public class WireToStateAttribute : Attribute {
+public class WireToStateAttribute : Attribute
+{
     public string StatePropertyName { get; }
     public string NodePath { get; }
     public string NodeProperty { get; }

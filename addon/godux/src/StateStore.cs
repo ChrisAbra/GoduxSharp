@@ -1,12 +1,18 @@
 
 using System.Collections.Concurrent;
 using System.Reflection;
+using Godot;
+
+namespace Godux;
 
 public abstract record State { }
-public abstract class StateStore<T> : Node
+public abstract partial class StateStore<T> : Node
     where T : State
 {
-    public T CurrentState { get; private set; }
+
+    public abstract record Action;
+
+    public T CurrentState { get; protected set; }
 
     protected readonly List<T> historicStates = new();
 
@@ -20,13 +26,13 @@ public abstract class StateStore<T> : Node
 
     public static StateStore<T> Instance { get; protected set; }
 
-    protected abstract string Path { get; }
+    protected virtual string Path => "/root/AppState";
 
     public abstract override void _Ready();
 
     private PropertyInfo[] CachedProperties;
 
-    private readonly ConcurrentDictionary<PropertyInfo, Subscriber> Subscribers = new();
+    private ConcurrentDictionary<PropertyInfo, Subscriber> Subscribers = new();
 
     public void Dispatch(Action action)
     {
@@ -81,11 +87,11 @@ public abstract class StateStore<T> : Node
         return changedProperties;
     }
 
-    public void AddSubscriber(PropertyInfo propertyInfo, Subscriber subscriber)
+    public void AddSubscriber(PropertyInfo propertyInfo, Subscriber newSubscriber)
     {
-        Subscribers.TryGetValue(propertyInfo, out Subscriber subscribers);
-        subscribers += subscriber;
-        Subscribers.TryAdd(propertyInfo, subscribers);
+        Subscribers.TryGetValue(propertyInfo, out Subscriber existingSubscribers);
+        existingSubscribers += newSubscriber;
+        Subscribers.TryAdd(propertyInfo, existingSubscribers);
     }
 
     protected void On(Type actionType, Reducer reducer)
@@ -93,14 +99,18 @@ public abstract class StateStore<T> : Node
         Reducers.Add(actionType, reducer);
     }
 
-    private PropertyInfo GetPropertyFromName(string propertyName)
+    private PropertyInfo GetStatePropertyFromName(string propertyName)
     {
-        return GetType().GetProperty(propertyName);
+        return CurrentState.GetType().GetProperty(propertyName);
     }
 
-    private object GetValueFromName(string propertyName)
+    private object GetStateValue(string propertyName)
     {
-        return GetType().GetProperty(propertyName).GetValue(this);
+        return GetStatePropertyFromName(propertyName)?.GetValue(CurrentState);
+    }
+    private object GetStateValue(PropertyInfo propertyInfo)
+    {
+        return propertyInfo?.GetValue(CurrentState);
     }
 
 
@@ -112,12 +122,18 @@ public abstract class StateStore<T> : Node
                               select new { Info = property, Attribute = attribute[0] as WireToStateAttribute };
         foreach (var prop in wiredProperties)
         {
-            var statePropertyName = prop.Attribute.StatePropertyName;
-            var value = this.GetValueFromName(statePropertyName);
-            SetNodesWithProperty(node, prop.Info, value);
+            var stateProperty = GetStatePropertyFromName(prop.Attribute.StatePropertyName);
+            var value = GetStateValue(stateProperty);
+
+            if (prop.Info.PropertyType != stateProperty.PropertyType)
+            {
+                throw new Exception("Type of wired property does not match state property. Change the type or extend the state and update the reducer functions");
+            }
+
+            SetNodesWithProperty(node, prop.Info, value, prop.Attribute.NodePath, prop.Attribute.NodeProperty);
             // if the delegate is not provided/overrden - provide a default one
-            var _subscriber = subscriber ?? ((_, __, newValue) => SetNodesWithProperty(node, prop.Info, newValue, prop.Attribute.NodeProperty, prop.Attribute.NodeProperty));
-            AddSubscriber(GetPropertyFromName(statePropertyName), subscriber);
+            var _subscriber = subscriber ?? ((_, __, newValue) => SetNodesWithProperty(node, prop.Info, newValue, prop.Attribute.NodePath, prop.Attribute.NodeProperty));
+            AddSubscriber(stateProperty, _subscriber);
         }
     }
 
@@ -132,10 +148,19 @@ public abstract class StateStore<T> : Node
         if (childNodePath != null && childNodeProperty != null)
         {
             var childNode = node.GetNode(childNodePath);
-            foreach (var prop in childNode.GetType().GetProperties())
+            if (childNode == null)
+            {
+                throw new Exception("Child node not found for WireToStateAttribute");
+            }
+            foreach (var prop in childNode.GetType()?.GetProperties())
             {
                 if (prop.Name == childNodeProperty)
                 {
+                    if (prop.PropertyType != nodePropertyInfo.PropertyType)
+                    {
+                        throw new Exception("Type of wired property's child target does not match state property. Change the type or extend the state and update the reducer functions");
+                    }
+
                     prop.SetValue(childNode, newValue);
                     break;
                 }

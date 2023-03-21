@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://dan5mvx1jqak3"]
+[gd_scene load_steps=2 format=3 uid="uid://3vl1chs8x1us"]
 
-[ext_resource type="Script" path="res://addon/redux/src/Example/ExampleWired.cs" id="1_0hnr0"]
+[ext_resource type="Script" path="res://addon/godux/example/ExampleWired.cs" id="1_0hnr0"]
 
 [node name="Control" type="Control"]
 layout_mode = 3
@@ -18,35 +18,57 @@ layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_left = 1.0
+offset_right = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 
 [node name="HeaderText" type="Label" parent="VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
+size_flags_vertical = 3
 text = "godot set default"
 
-[node name="TabContainer" type="TabContainer" parent="VBoxContainer"]
-unique_name_in_owner = true
+[node name="Panel" type="Panel" parent="VBoxContainer"]
 layout_mode = 2
+size_flags_vertical = 3
 
-[node name="First Page" type="Control" parent="VBoxContainer/TabContainer"]
-layout_mode = 2
-
-[node name="Thumbnails" type="GridContainer" parent="VBoxContainer/TabContainer/First Page"]
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Panel"]
 layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -191.0
+offset_top = -15.0
+offset_right = 113.0
+offset_bottom = 16.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="Second Page" type="Control" parent="VBoxContainer/TabContainer"]
-visible = false
+[node name="Decrement" type="Button" parent="VBoxContainer/Panel/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+text = "- "
 
-[node name="Button" type="Button" parent="VBoxContainer"]
+[node name="Label" type="Label" parent="VBoxContainer/Panel/HBoxContainer"]
 layout_mode = 2
-text = "Change the text to \"Cool guy\""
+size_flags_horizontal = 3
+text = "Counter : "
 
-[connection signal="pressed" from="VBoxContainer/Button" to="." method="ChangeText"]
+[node name="Counter" type="Label" parent="VBoxContainer/Panel/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "0"
+
+[node name="Increment" type="Button" parent="VBoxContainer/Panel/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 4
+text = "+"
+
+[connection signal="pressed" from="VBoxContainer/Panel/HBoxContainer/Decrement" to="." method="DecrementCounter"]
+[connection signal="pressed" from="VBoxContainer/Panel/HBoxContainer/Increment" to="." method="IncrementCounter"]
