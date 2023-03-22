@@ -17,4 +17,11 @@ public class WireToStateAttribute : Attribute
         this.NodePath = nodePath;
         this.NodeProperty = nodeProperty;
     }
+    public WireToStateAttribute(string[] statePropertyPaths, string nodePath, string nodeProperty)
+    {
+        this.StatePropertyName = string.Join(".",statePropertyPaths);
+        this.NodePath = nodePath;
+        this.NodeProperty = nodeProperty;
+    }
+
 }

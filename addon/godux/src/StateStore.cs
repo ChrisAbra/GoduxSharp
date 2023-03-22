@@ -9,7 +9,6 @@ public abstract record State { }
 public abstract partial class StateStore<T> : Node
     where T : State
 {
-
     public abstract record Action;
 
     public T CurrentState { get; protected set; }
@@ -101,18 +100,30 @@ public abstract partial class StateStore<T> : Node
 
     private PropertyInfo GetStatePropertyFromName(string propertyName)
     {
-        return CurrentState.GetType().GetProperty(propertyName);
+        GD.Print("============ Get Prop from Name =======");
+        GD.Print(propertyName);
+        PropertyInfo stateProperty = null;
+        foreach(string path in propertyName.Split(".")){
+            GD.Print(path);
+            GD.Print(stateProperty);
+
+            if(stateProperty is null){
+                stateProperty = CurrentState.GetType().GetProperty(path);
+            }
+            else {
+                GD.Print(stateProperty.PropertyType);
+                stateProperty = stateProperty.PropertyType.GetProperty(path);
+            }
+        }
+        GD.Print(stateProperty);
+
+        return stateProperty;
     }
 
-    private object GetStateValue(string propertyName)
-    {
-        return GetStatePropertyFromName(propertyName)?.GetValue(CurrentState);
-    }
     private object GetStateValue(PropertyInfo propertyInfo)
     {
         return propertyInfo?.GetValue(CurrentState);
     }
-
 
     public void ConnectWiredAttributes(Node node, Subscriber subscriber = null)
     {
@@ -120,6 +131,7 @@ public abstract partial class StateStore<T> : Node
                               let attribute = property.GetCustomAttributes(typeof(WireToStateAttribute), true)
                               where attribute.Length == 1
                               select new { Info = property, Attribute = attribute[0] as WireToStateAttribute };
+
         foreach (var prop in wiredProperties)
         {
             var stateProperty = GetStatePropertyFromName(prop.Attribute.StatePropertyName);
@@ -132,39 +144,35 @@ public abstract partial class StateStore<T> : Node
 
             SetNodesWithProperty(node, prop.Info, value, prop.Attribute.NodePath, prop.Attribute.NodeProperty);
             // if the delegate is not provided/overrden - provide a default one
-            var _subscriber = subscriber ?? ((_, __, newValue) => SetNodesWithProperty(node, prop.Info, newValue, prop.Attribute.NodePath, prop.Attribute.NodeProperty));
+            var _subscriber = subscriber ?? ((statePropertyInfo, oldValue, newValue) => SetNodesWithProperty(node, prop.Info, newValue, prop.Attribute.NodePath, prop.Attribute.NodeProperty));
             AddSubscriber(stateProperty, _subscriber);
         }
     }
 
-    static void SetNodesWithProperty(Node node, PropertyInfo nodePropertyInfo, object newValue)
+    static void SetNodesWithProperty(Node node, PropertyInfo nodePropertyInfo, object newValue, string childNodePath = null, string childNodePropertyName = null)
     {
         nodePropertyInfo.SetValue(node, newValue);
-    }
 
-    static void SetNodesWithProperty(Node node, PropertyInfo nodePropertyInfo, object newValue, string childNodePath = null, string childNodeProperty = null)
-    {
-        SetNodesWithProperty(node, nodePropertyInfo, newValue);
-        if (childNodePath != null && childNodeProperty != null)
+        if (childNodePath == null || childNodePropertyName == null)
         {
-            var childNode = node.GetNode(childNodePath);
-            if (childNode == null)
-            {
-                throw new Exception("Child node not found for WireToStateAttribute");
-            }
-            foreach (var prop in childNode.GetType()?.GetProperties())
-            {
-                if (prop.Name == childNodeProperty)
-                {
-                    if (prop.PropertyType != nodePropertyInfo.PropertyType)
-                    {
-                        throw new Exception("Type of wired property's child target does not match state property. Change the type or extend the state and update the reducer functions");
-                    }
-
-                    prop.SetValue(childNode, newValue);
-                    break;
-                }
-            }
+            return;
         }
+        var childNode = node?.GetNode(childNodePath);
+        if (childNode == null)
+        {
+            throw new Exception("Child node not found for WireToStateAttribute");
+        }
+
+        var childNodeProperty = from property in childNode.GetType().GetProperties()
+                                where property.Name == childNodePropertyName
+                                select property;
+
+        var childProperty = childNodeProperty.First();
+        if (childProperty.PropertyType != nodePropertyInfo.PropertyType)
+        {
+            throw new Exception("Type of wired property's child target does not match state property. Change the type or extend the state and update the reducer functions");
+        }
+
+        childProperty.SetValue(childNode, newValue);
     }
 }

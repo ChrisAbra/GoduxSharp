@@ -1,8 +1,6 @@
 using System.Collections.Immutable;
 
-using Godux;
-
-public partial class ExampleStateStore : StateStore<ExampleState>
+public partial class ExampleStateStore : Godux.StateStore<ExampleState>
 {
     protected override string Path => "/root/AppState";
 
@@ -26,13 +24,13 @@ public partial class ExampleStateStore : StateStore<ExampleState>
         });
         On(typeof(DecrementCounter), (state, _) =>
         {
-            var counter = state.Counter - 1;
-            return state with { Counter = counter, CounterString = counter.ToString() };
+            var counter = state.CounterSubState.Counter - 1;
+            return state with { CounterSubState = state.CounterSubState with  {Counter = counter}};
         });
         On(typeof(IncrementCounter), (state, _) =>
         {
-            var counter = state.Counter + 1;
-            return state with { Counter = counter, CounterString = counter.ToString() };
+            var counter = state.CounterSubState.Counter + 1;
+            return state with { CounterSubState = state.CounterSubState with  {Counter = counter}};
         });
     }
 }

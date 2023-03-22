@@ -7,13 +7,16 @@ public partial class ExampleWired : Control
     [WireToState(nameof(ExampleState.HeaderText), "%HeaderText", nameof(Label.Text))]
     public string HeaderText { get; set; }
 
-
-    [WireToState(nameof(ExampleState.CounterString), "%Counter", nameof(Label.Text))]
+    [WireToState(new string[]{
+        nameof(ExampleState.CounterSubState),
+        nameof(ExampleSubState.CounterString)
+        }, "%Counter", nameof(Label.Text))]
     public string CounterStringValue { get; set; }
 
     public override void _Ready()
     {
         AppState.Instance.ConnectWiredAttributes(this);
+        ChangeText();
     }
 
     public void ChangeText()
