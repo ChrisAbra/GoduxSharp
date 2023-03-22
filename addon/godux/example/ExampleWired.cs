@@ -7,16 +7,23 @@ public partial class ExampleWired : Control
     [WireToState(nameof(ExampleState.HeaderText), "%HeaderText", nameof(Label.Text))]
     public string HeaderText { get; set; }
 
-    [WireToState(new string[]{
-        nameof(ExampleState.CounterSubState),
-        nameof(ExampleSubState.CounterString)
-        }, "%Counter", nameof(Label.Text))]
-    public string CounterStringValue { get; set; }
+    [WireToState(new string[]{nameof(ExampleState.CounterString)}, "%Counter", nameof(Label.Text))]
+    public string CounterStringValue
+    {
+        get => _counterStringValue;
+        set  {_counterStringValue = value;
+            CounterSet(value);}
+    }
+    private string _counterStringValue;
 
     public override void _Ready()
     {
         AppState.Instance.ConnectWiredAttributes(this);
         ChangeText();
+    }
+
+    public void CounterSet(string value){
+        GD.Print("Counter Set with new value: ", value);
     }
 
     public void ChangeText()

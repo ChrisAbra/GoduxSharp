@@ -24,13 +24,13 @@ public partial class ExampleStateStore : Godux.StateStore<ExampleState>
         });
         On(typeof(DecrementCounter), (state, _) =>
         {
-            var counter = state.CounterSubState.Counter - 1;
-            return state with { CounterSubState = state.CounterSubState with  {Counter = counter}};
+            var counter = state.Counter - 1;
+            return state with { Counter  = counter};
         });
         On(typeof(IncrementCounter), (state, _) =>
         {
-            var counter = state.CounterSubState.Counter + 1;
-            return state with { CounterSubState = state.CounterSubState with  {Counter = counter}};
+            var counter = state.Counter + 1;
+            return state with { Counter  = counter};
         });
     }
 }
