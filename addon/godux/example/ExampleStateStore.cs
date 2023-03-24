@@ -41,7 +41,7 @@ public partial class ExampleStateStore : Godux.StateStore<ExampleState>
         On(typeof(SetUndoableString), (state, action) =>
         {
             var setUndoableAction = action as SetUndoableString;
-            return state with { UndoableString = state.UndoableString.Update(setUndoableAction.NewValue)};
+            return state with { UndoableString = state.UndoableString.Set(setUndoableAction.NewValue)};
         });
     }
 }

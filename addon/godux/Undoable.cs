@@ -5,7 +5,7 @@ public record Undoable<T>
 where T : class
 {
     private readonly List<T> past = new();//e.g [1,2,3,4]
-    public T Present {get;init;} // 5
+    public T Present { get; init; } // 5
     private readonly List<T> future = new(); //[6,7] 
 
     public bool CanUndo()
@@ -24,18 +24,16 @@ where T : class
 
     public Undoable<T> Undo()
     {
-        var returnValue = this with {};
-        if (CanUndo())
-        {
-            returnValue = this with {Present = past.Last()};
-            returnValue.future.Insert(0, Present);
-            returnValue.past.RemoveAt(past.Count - 1);
-        }
-        return returnValue;
+        if (!CanUndo()) return this;
+
+        var returnValue = this with { Present = past[-1] };
+        returnValue.future.Insert(0, Present);
+        returnValue.past.RemoveAt(past.Count - 1);
+        return returnValue ?? this;
     }
-    public Undoable<T> Update(T newValue)
+    public Undoable<T> Set(T newValue)
     {
-        var returnValue = this with {};
+        var returnValue = this with { };
         returnValue.future.Clear();
         returnValue.past.Add(Present);
         return returnValue with { Present = newValue };
@@ -43,13 +41,11 @@ where T : class
 
     public Undoable<T> Redo()
     {
-        var returnValue = this with {};
-        if (CanRedo())
-        {
-            returnValue = this with {Present = future.First()};
-            returnValue.past.Add(Present);
-            returnValue.future.RemoveAt(0);
-        }
+        if (!CanRedo()) return this;
+
+        var returnValue = this with { Present = future[0] };
+        returnValue.past.Add(Present);
+        returnValue.future.RemoveAt(0);
         return returnValue;
     }
 
