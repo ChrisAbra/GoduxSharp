@@ -35,17 +35,16 @@ size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/Panel"]
 layout_mode = 1
-anchors_preset = 8
+anchors_preset = 7
 anchor_left = 0.5
-anchor_top = 0.5
+anchor_top = 1.0
 anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -191.0
-offset_top = -15.0
-offset_right = 113.0
-offset_bottom = 16.0
+anchor_bottom = 1.0
+offset_left = -152.0
+offset_top = -31.0
+offset_right = 152.0
 grow_horizontal = 2
-grow_vertical = 2
+grow_vertical = 0
 
 [node name="Decrement" type="Button" parent="VBoxContainer/Panel/HBoxContainer"]
 layout_mode = 2
@@ -70,5 +69,33 @@ size_flags_horizontal = 3
 size_flags_vertical = 4
 text = "+"
 
+[node name="HBoxContainer2" type="HBoxContainer" parent="VBoxContainer/Panel"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="UndoButton" type="Button" parent="VBoxContainer/Panel/HBoxContainer2"]
+layout_mode = 2
+text = "Undo
+"
+
+[node name="RedoButton" type="Button" parent="VBoxContainer/Panel/HBoxContainer2"]
+layout_mode = 2
+text = "Redo"
+
+[node name="TitleTextEditor" type="TextEdit" parent="VBoxContainer/Panel/HBoxContainer2"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+placeholder_text = "Enter title text"
+
+[node name="SetTitleButton" type="Button" parent="VBoxContainer/Panel/HBoxContainer2"]
+layout_mode = 2
+text = "Set Title"
+
 [connection signal="pressed" from="VBoxContainer/Panel/HBoxContainer/Decrement" to="." method="DecrementCounter"]
 [connection signal="pressed" from="VBoxContainer/Panel/HBoxContainer/Increment" to="." method="IncrementCounter"]
+[connection signal="pressed" from="VBoxContainer/Panel/HBoxContainer2/UndoButton" to="." method="OnUndoTitle"]
+[connection signal="pressed" from="VBoxContainer/Panel/HBoxContainer2/RedoButton" to="." method="OnRedoTitle"]
+[connection signal="pressed" from="VBoxContainer/Panel/HBoxContainer2/SetTitleButton" to="." method="OnSetText"]

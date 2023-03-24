@@ -1,0 +1,60 @@
+using System.Collections.Generic;
+namespace Godux;
+
+public record Undoable<T>
+where T : class
+{
+    private readonly List<T> past = new();//e.g [1,2,3,4]
+    public T Present {get;init;} // 5
+    private readonly List<T> future = new(); //[6,7] 
+
+    public bool CanUndo()
+    {
+        return past.Count > 0;
+    }
+    public bool CanRedo()
+    {
+        return future.Count > 0;
+    }
+
+    public Undoable(T value)
+    {
+        Present = value;
+    }
+
+    public Undoable<T> Undo()
+    {
+        var returnValue = this with {};
+        if (CanUndo())
+        {
+            returnValue = this with {Present = past.Last()};
+            returnValue.future.Insert(0, Present);
+            returnValue.past.RemoveAt(past.Count - 1);
+        }
+        return returnValue;
+    }
+    public Undoable<T> Update(T newValue)
+    {
+        var returnValue = this with {};
+        returnValue.future.Clear();
+        returnValue.past.Add(Present);
+        return returnValue with { Present = newValue };
+    }
+
+    public Undoable<T> Redo()
+    {
+        var returnValue = this with {};
+        if (CanRedo())
+        {
+            returnValue = this with {Present = future.First()};
+            returnValue.past.Add(Present);
+            returnValue.future.RemoveAt(0);
+        }
+        return returnValue;
+    }
+
+    public static implicit operator Undoable<T>(T someValue)
+    {
+        return new Undoable<T>(someValue);
+    }
+}

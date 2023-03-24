@@ -31,7 +31,7 @@ public abstract partial class StateStore<T> : Node
 
     private PropertyInfo[] CachedProperties;
 
-    private ConcurrentDictionary<PropertyInfo, Subscriber> Subscribers = new();
+    private readonly ConcurrentDictionary<PropertyInfo, Subscriber> Subscribers = new();
 
     public void Dispatch(Action action)
     {
@@ -100,22 +100,15 @@ public abstract partial class StateStore<T> : Node
 
     private PropertyInfo GetStatePropertyFromName(string propertyName)
     {
-        GD.Print("============ Get Prop from Name =======");
-        GD.Print(propertyName);
         PropertyInfo stateProperty = null;
         foreach(string path in propertyName.Split(".")){
-            GD.Print(path);
-            GD.Print(stateProperty);
-
             if(stateProperty is null){
                 stateProperty = CurrentState.GetType().GetProperty(path);
             }
             else {
-                GD.Print(stateProperty.PropertyType);
                 stateProperty = stateProperty.PropertyType.GetProperty(path);
             }
         }
-        GD.Print(stateProperty);
 
         return stateProperty;
     }

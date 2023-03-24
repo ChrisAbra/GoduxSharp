@@ -4,7 +4,7 @@ using AppState = ExampleStateStore;
 public partial class ExampleWired : Control
 {
 
-    [WireToState(nameof(ExampleState.HeaderText), "%HeaderText", nameof(Label.Text))]
+    [WireToState(nameof(ExampleState.UndoableStringPresent), "%HeaderText", nameof(Label.Text))]
     public string HeaderText { get; set; }
 
     [WireToState(new string[]{nameof(ExampleState.CounterString)}, "%Counter", nameof(Label.Text))]
@@ -19,17 +19,28 @@ public partial class ExampleWired : Control
     public override void _Ready()
     {
         AppState.Instance.ConnectWiredAttributes(this);
-        ChangeText();
     }
 
     public void CounterSet(string value){
         GD.Print("Counter Set with new value: ", value);
     }
 
-    public void ChangeText()
+    public void OnSetText()
     {
-        AppState.Instance.Dispatch(new AppState.ChangedHeaderText("Cooler HeaderText"));
+        var newHeaderText = GetNode<TextEdit>("%TitleTextEditor").Text;
+
+        AppState.Instance.Dispatch(new AppState.SetUndoableString(newHeaderText));
     }
+    public void OnUndoTitle()
+    {
+        AppState.Instance.Dispatch(new AppState.UndoUndoableString());
+    }
+
+    public void OnRedoTitle()
+    {
+        AppState.Instance.Dispatch(new AppState.RedoUndoableString());
+    }
+
 
     public void IncrementCounter()
     {

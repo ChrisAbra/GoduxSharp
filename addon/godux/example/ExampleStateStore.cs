@@ -1,4 +1,5 @@
 using System.Collections.Immutable;
+using Godot;
 
 public partial class ExampleStateStore : Godux.StateStore<ExampleState>
 {
@@ -7,6 +8,9 @@ public partial class ExampleStateStore : Godux.StateStore<ExampleState>
     public record ChangedHeaderText(string HeaderText) : Action;
     public record IncrementCounter() : Action;
     public record DecrementCounter() : Action;
+    public record UndoUndoableString() : Action;
+    public record RedoUndoableString() : Action;
+    public record SetUndoableString(string NewValue) : Action;
 
     public ExampleStateStore()
     {
@@ -25,12 +29,19 @@ public partial class ExampleStateStore : Godux.StateStore<ExampleState>
         On(typeof(DecrementCounter), (state, _) =>
         {
             var counter = state.Counter - 1;
-            return state with { Counter  = counter};
+            return state with { Counter = counter };
         });
         On(typeof(IncrementCounter), (state, _) =>
         {
             var counter = state.Counter + 1;
-            return state with { Counter  = counter};
+            return state with { Counter = counter };
+        });
+        On(typeof(UndoUndoableString), (state, _) => state with { UndoableString = state.UndoableString.Undo() });
+        On(typeof(RedoUndoableString), (state, _) => state with { UndoableString = state.UndoableString.Redo() });
+        On(typeof(SetUndoableString), (state, action) =>
+        {
+            var setUndoableAction = action as SetUndoableString;
+            return state with { UndoableString = state.UndoableString.Update(setUndoableAction.NewValue)};
         });
     }
 }
