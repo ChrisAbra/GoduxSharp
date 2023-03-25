@@ -23,7 +23,7 @@ public partial class ExampleWired : Control
     public override void _Ready()
     {
         AppState.Instance.ConnectWiredAttributes(this);
-        AppState.Instance.Dispatch(new AppState.SubStateUpdater("new Substate value"));
+        AppState.Instance.Dispatch(new AppState.SubStateStringUpdater("new Substate value"));
     }
 
     public void CounterSet(string value)

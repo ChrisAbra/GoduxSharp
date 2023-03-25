@@ -22,35 +22,20 @@ public partial class ExampleStateStore : Godux.StateStore<ExampleState>
     public override void _Ready()
     {
         Instance = this.GetNode<ExampleStateStore>(Path);
-
-        On(typeof(ChangedHeaderText), (state, action) =>
-        {
-            var headerUpdateAction = action as ChangedHeaderText;
-            return state with { HeaderText = headerUpdateAction.HeaderText };
-        });
-        On(typeof(DecrementCounter), (state, _) =>
-        {
-            var counter = state.Counter - 1;
-            return state with { Counter = counter };
-        });
-        On(typeof(IncrementCounter), (state, _) =>
-        {
-            var counter = state.Counter + 1;
-            return state with { Counter = counter };
-        });
-        On(typeof(UndoUndoableString), (state, _) => state with { UndoableString = state.UndoableString.Undo() });
-        On(typeof(RedoUndoableString), (state, _) => state with { UndoableString = state.UndoableString.Redo() });
-        On(typeof(SetUndoableString), (state, action) =>
-        {
-            var setUndoableAction = action as SetUndoableString;
-            return state with { UndoableString = state.UndoableString.Set(setUndoableAction.NewValue) };
-        });
-
-        //If splitting the class definition for easier control over substates you need to ensure those functions are called to add the Reducers
-        AddPartialStateReducerFunctions();
     }
 
-    public void AddPartialStateReducerFunctions(){
-        ContinuedReducers();
+    protected override ExampleState Reduce(ExampleState state, Action topLevelAction)
+    {
+        return topLevelAction switch
+        {
+            ChangedHeaderText action => state with { HeaderText = action.HeaderText },
+            DecrementCounter _ => state with { Counter = state.Counter - 1 },
+            IncrementCounter _ => state with { Counter = state.Counter + 1 },
+            UndoUndoableString _ => state with { UndoableString = state.UndoableString.Undo() },
+            RedoUndoableString _ => state with { UndoableString = state.UndoableString.Redo() },
+            SetUndoableString action => state with { UndoableString = state.UndoableString.Set(action.NewValue) },
+            SubStateUpdater action => state with { Substate = ReduceSubStateUpdater(state.Substate, action) },
+            _ => state,
+        };
     }
 }

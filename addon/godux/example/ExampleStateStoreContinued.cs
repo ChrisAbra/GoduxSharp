@@ -1,17 +1,18 @@
 namespace Godux.Example;
 
+
 public partial class ExampleStateStore : Godux.StateStore<ExampleState>
 {
-    public record SubStateUpdater(string SubstateValue) : Action;
+    public record SubStateUpdater : Action;
+    public record SubStateStringUpdater(string SubstateString) : SubStateUpdater;
 
-    public void ContinuedReducers()
+
+    private static ExampleSubState ReduceSubStateUpdater(ExampleSubState substate, SubStateUpdater subaction)
     {
-        On(typeof(SubStateUpdater), (state, action) =>
+        return subaction switch
         {
-            var subStateUpdater = action as SubStateUpdater;
-            var newSubstate = state.Substate with { SubstateValue = subStateUpdater.SubstateValue};
-            return state with { Substate = newSubstate };
-        });
-
+            SubStateStringUpdater action => substate with { SubstateValue = action.SubstateString },
+            _ => substate,
+        };
     }
 }

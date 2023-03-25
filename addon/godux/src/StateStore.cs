@@ -9,13 +9,7 @@ namespace Godux;
 public abstract partial class StateStore<T> : Node
     where T : State
 {
-    public abstract record Action;
-
     public T CurrentState { get; protected set; }
-
-    private readonly Dictionary<Type, Reducer> Reducers = new();
-
-    public delegate T Reducer(T state, Action action);
 
     public delegate void Subscriber(PropertyInfo propertyInfo, object oldValue, object newValue);
 
@@ -27,13 +21,14 @@ public abstract partial class StateStore<T> : Node
 
     private PropertyInfo[] CachedProperties;
 
+    protected abstract T Reduce(T state, Action action);
+
     private readonly ConcurrentDictionary<PropertyInfo, Subscriber> Subscribers = new();
-    readonly List<ChangedProperty> changedProperties = new();
+    private readonly List<ChangedProperty> changedProperties = new();
 
     public void Dispatch(Action action)
     {
-        Reducer reducer = Reducers[action.GetType()];
-        var newState = reducer?.Invoke(CurrentState, action) ?? CurrentState;
+        var newState = Reduce(CurrentState,action);
         HandleStateUpdate(CurrentState, newState);
     }
 
@@ -43,8 +38,8 @@ public abstract partial class StateStore<T> : Node
         {
             return;
         }
-        NotifySubscribers(GetChangedValues(oldState, newState));
         CurrentState = newState;
+        NotifySubscribers(GetChangedValues(oldState, newState));
     }
 
     private void NotifySubscribers(List<ChangedProperty> changedProperties)
@@ -89,11 +84,6 @@ public abstract partial class StateStore<T> : Node
         Subscribers.TryGetValue(propertyInfo, out Subscriber existingSubscribers);
         existingSubscribers += newSubscriber;
         Subscribers.TryAdd(propertyInfo, existingSubscribers);
-    }
-
-    protected void On(Type actionType, Reducer reducer)
-    {
-        Reducers.Add(actionType, reducer);
     }
 
     private PropertyInfo GetStatePropertyFromName(string propertyName)
