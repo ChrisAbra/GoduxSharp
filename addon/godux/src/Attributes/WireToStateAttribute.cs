@@ -5,9 +5,11 @@ namespace Godux;
 public class WireToStateAttribute : Attribute
 {
     public string StatePropertyName { get; }
+    public string SubstateName {get;}
     public string NodePath { get; }
     public string NodeProperty { get; }
 
+    public WireToStateAttribute(){}
     public WireToStateAttribute(string statePropertyName)
     {
         this.StatePropertyName = statePropertyName;
@@ -24,5 +26,11 @@ public class WireToStateAttribute : Attribute
         this.NodePath = nodePath;
         this.NodeProperty = nodeProperty;
     }
-
+    public WireToStateAttribute(string statePropertyName, string substateName, string nodePath, string nodeProperty)
+    {
+        this.StatePropertyName = statePropertyName;
+        this.SubstateName = substateName;
+        this.NodePath = nodePath;
+        this.NodeProperty = nodeProperty;
+    }
 }

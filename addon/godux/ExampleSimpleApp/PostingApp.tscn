@@ -1,0 +1,70 @@
+[gd_scene load_steps=5 format=3 uid="uid://dmy78wkebrmmd"]
+
+[ext_resource type="Script" path="res://addon/godux/ExampleSimpleApp/PostContainer.cs" id="1_i6d4y"]
+[ext_resource type="PackedScene" uid="uid://b7etnuyamx210" path="res://addon/godux/ExampleSimpleApp/post.tscn" id="1_msxyi"]
+[ext_resource type="Script" path="res://addon/godux/ExampleSimpleApp/PostingApp.cs" id="1_xtvia"]
+[ext_resource type="PackedScene" uid="uid://cbid8ny65mug6" path="res://addon/godux/ExampleSimpleApp/poster.tscn" id="2_txnyg"]
+
+[node name="PostingApp" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xtvia")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Panel"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 30.0
+offset_top = 30.0
+offset_right = -30.0
+offset_bottom = -30.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="NumPosts" type="Label" parent="Panel/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Number of Posts: 0"
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Undo" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Undo"
+
+[node name="Redo" type="Button" parent="Panel/VBoxContainer/HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "Redo"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="PostContainer" type="VBoxContainer" parent="Panel/VBoxContainer/ScrollContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+script = ExtResource("1_i6d4y")
+PostScene = ExtResource("1_msxyi")
+
+[node name="Poster" parent="Panel/VBoxContainer" instance=ExtResource("2_txnyg")]
+layout_mode = 2
+
+[connection signal="pressed" from="Panel/VBoxContainer/HBoxContainer/Undo" to="." method="Undo"]
+[connection signal="pressed" from="Panel/VBoxContainer/HBoxContainer/Redo" to="." method="Redo"]

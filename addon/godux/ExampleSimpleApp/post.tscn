@@ -1,0 +1,39 @@
+[gd_scene load_steps=2 format=3 uid="uid://b7etnuyamx210"]
+
+[ext_resource type="Script" path="res://addon/godux/ExampleSimpleApp/Post.cs" id="1_xr2ro"]
+
+[node name="Post" type="Panel"]
+custom_minimum_size = Vector2(2.08165e-12, 50)
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.115741
+offset_right = 1.52588e-05
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_xr2ro")
+metadata/_edit_use_anchors_ = true
+
+[node name="HBoxContainer" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Poster" type="Label" parent="HBoxContainer"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(100, 2.08165e-12)
+layout_mode = 2
+size_flags_vertical = 5
+text = "Chris:"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="PostText" type="RichTextLabel" parent="HBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 5
+text = "Hello there "
+scroll_active = false

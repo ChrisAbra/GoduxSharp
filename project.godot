@@ -11,13 +11,13 @@ config_version=5
 [application]
 
 config/name="Redux"
-run/main_scene="res://main.tscn"
+run/main_scene="res://addon/godux/ExampleSimpleApp/PostingApp.tscn"
 config/features=PackedStringArray("4.0", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
-AppState="*res://addon/godux/example/ExampleStateStore.cs"
+AppState="*res://addon/godux/ExampleSimpleApp/AppState/PostingAppStateStore.cs"
 
 [display]
 

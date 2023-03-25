@@ -1,0 +1,23 @@
+[gd_scene load_steps=2 format=3 uid="uid://cbid8ny65mug6"]
+
+[ext_resource type="Script" path="res://addon/godux/ExampleSimpleApp/Poster.cs" id="1_1wqg5"]
+
+[node name="Poster" type="HBoxContainer"]
+anchors_preset = -1
+anchor_right = 1.0
+anchor_bottom = 0.117284
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_1wqg5")
+metadata/_edit_use_anchors_ = true
+
+[node name="TextEditor" type="TextEdit" parent="."]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Post" type="Button" parent="."]
+layout_mode = 2
+text = "     Post     "
+
+[connection signal="pressed" from="Post" to="." method="PressPost"]

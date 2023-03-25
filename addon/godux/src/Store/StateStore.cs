@@ -11,24 +11,25 @@ public abstract partial class StateStore<T> : Node
 {
     public T CurrentState { get; protected set; }
 
-    public delegate void Subscriber(PropertyInfo propertyInfo, object oldValue, object newValue);
+    public delegate void Subscriber(PropertyInfo propertyInfo, State state, object oldValue, object newValue);
 
     public static StateStore<T> Instance { get; protected set; }
 
     protected virtual string Path => "/root/AppState";
+    public abstract void InitaliseState();
 
-    public abstract override void _Ready();
-
-    private PropertyInfo[] CachedProperties;
+    public override void _Ready(){
+        Instance = this.GetNode<StateStore<T>>(Path);
+        InitaliseState();
+    }
 
     protected abstract T Reduce(T state, Action action);
 
     private readonly ConcurrentDictionary<PropertyInfo, Subscriber> Subscribers = new();
-    private readonly List<ChangedProperty> changedProperties = new();
 
     public void Dispatch(Action action)
     {
-        var newState = Reduce(CurrentState,action);
+        var newState = Reduce(CurrentState, action);
         HandleStateUpdate(CurrentState, newState);
     }
 
@@ -39,44 +40,23 @@ public abstract partial class StateStore<T> : Node
             return;
         }
         CurrentState = newState;
-        NotifySubscribers(GetChangedValues(oldState, newState));
+        var changedProperties = CurrentState.GetChangedValues(oldState);
+
+        NotifySubscribers(changedProperties);
     }
 
-    private void NotifySubscribers(List<ChangedProperty> changedProperties)
+    private void NotifySubscribers(List<State.ChangedProperty> changedProperties)
     {
         foreach (var prop in changedProperties)
         {
             Subscribers.TryGetValue(prop.propertyInfo, out Subscriber subscribers);
-            Task.Run(() => subscribers?.Invoke(prop.propertyInfo, prop.oldValue, prop.newValue));
+            subscribers?.Invoke(prop.propertyInfo, prop.state, prop.oldValue, prop.newValue);
         }
     }
-
-    private record ChangedProperty
+    public void AddSubscriber(string propertyFullPath, Subscriber newSubscriber)
     {
-        public PropertyInfo propertyInfo;
-        public object oldValue;
-        public object newValue;
-    }
-    private List<ChangedProperty> GetChangedValues(T oldState, T newState)
-    {
-        changedProperties.Clear();
-
-        CachedProperties ??= oldState.GetType().GetProperties();
-        foreach (var prop in CachedProperties)
-        {
-            var oldValue = prop.GetValue(oldState);
-            var newValue = prop.GetValue(newState);
-
-            dynamic newValueTyped = Convert.ChangeType(newValue, prop.PropertyType);
-            dynamic oldValueTyped = Convert.ChangeType(oldValue, prop.PropertyType);
-
-            if (newValueTyped != oldValueTyped)
-            {
-                GD.Print("+++ Changed:", prop.Name, " - ", newValue);
-                changedProperties.Add(new ChangedProperty { propertyInfo = prop, oldValue = oldValue, newValue = newValue });
-            }
-        }
-        return changedProperties;
+        var propertyInfo = GetStatePropertyFromName(propertyFullPath);
+        AddSubscriber(propertyInfo, newSubscriber);
     }
 
     public void AddSubscriber(PropertyInfo propertyInfo, Subscriber newSubscriber)
@@ -91,6 +71,7 @@ public abstract partial class StateStore<T> : Node
         PropertyInfo stateProperty = null;
         foreach (string path in propertyName.Split("."))
         {
+            GD.Print("Path: ", path);
             if (stateProperty is null)
             {
                 stateProperty = CurrentState.GetType().GetProperty(path);
@@ -99,6 +80,10 @@ public abstract partial class StateStore<T> : Node
             {
                 stateProperty = stateProperty.PropertyType.GetProperty(path);
             }
+        }
+
+        if(stateProperty == null){
+            throw new Exception($"Property not found for '{propertyName}'. Check the property name is correct and that the property on the state is not a field instead");
         }
 
         return stateProperty;
@@ -126,10 +111,17 @@ public abstract partial class StateStore<T> : Node
                 throw new Exception("Type of wired property does not match state property. Change the type or extend the state and update the reducer functions");
             }
 
-            SetNodesWithProperty(node, wiredProp.Info, value, wiredProp.Attribute.NodePath, wiredProp.Attribute.NodeProperty);
+
+            void DefaultWiredSubscriber(PropertyInfo statePropertyInfo, State state, object _, object newValue){
+                if(wiredProp.Attribute?.SubstateName != null){
+                    Type substateType = Type.GetType(wiredProp.Attribute.SubstateName);
+                    if(!substateType.IsAssignableFrom(state.GetType())) return; // Where the state doesnt match the expected type ignore.
+                }
+                SetNodesWithProperty(node, wiredProp.Info, newValue, wiredProp.Attribute.NodePath, wiredProp.Attribute.NodeProperty);
+            }
+
             // if the delegate is not provided/overrden - provide a default one
-            var _subscriber = subscriber ?? ((statePropertyInfo, oldValue, newValue) => 
-            SetNodesWithProperty(node, wiredProp.Info, newValue, wiredProp.Attribute.NodePath, wiredProp.Attribute.NodeProperty));
+            var _subscriber = subscriber ?? DefaultWiredSubscriber;
             AddSubscriber(stateProperty, _subscriber);
         }
     }
