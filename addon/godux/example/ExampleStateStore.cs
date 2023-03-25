@@ -5,7 +5,7 @@ namespace Godux.Example;
 
 public partial class ExampleStateStore : Godux.StateStore<ExampleState>
 {
-    protected override string Path => "/root/AppState";
+    //protected override string Path => "/root/AppState";
 
     public record ChangedHeaderText(string HeaderText) : Action;
     public record IncrementCounter : Action;

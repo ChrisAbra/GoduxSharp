@@ -33,6 +33,9 @@ where T : class
     }
     public UndoableState<T> Set(T newValue)
     {
+        if(EqualityComparer<T>.Default.Equals(newValue,Present)){
+            return this;
+        }
         var returnValue = this with { };
         returnValue.future.Clear();
         returnValue.past.Add(Present);
