@@ -13,7 +13,6 @@ public partial class ExampleStateStore : Godux.StateStore<ExampleState>
     public record UndoUndoableString : Action;
     public record RedoUndoableString : Action;
     public record SetUndoableString(string NewValue) : Action;
-    public record SubStateUpdater(string SubstateValue) : Action;
 
     public ExampleStateStore()
     {
@@ -46,10 +45,11 @@ public partial class ExampleStateStore : Godux.StateStore<ExampleState>
             var setUndoableAction = action as SetUndoableString;
             return state with { UndoableString = state.UndoableString.Set(setUndoableAction.NewValue) };
         });
-        On(typeof(SubStateUpdater), (state, action) =>
-        {
-            var subStateUpdater = action as SubStateUpdater;
-            return state with { Substate = state.Substate with { SubstateValue = subStateUpdater.SubstateValue } };
-        });
+
+        AddPartialStateReducerFunctions();
+    }
+
+    public void AddPartialStateReducerFunctions(){
+        ContinuedReducers();
     }
 }

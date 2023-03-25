@@ -13,15 +13,11 @@ public abstract partial class StateStore<T> : Node
 
     public T CurrentState { get; protected set; }
 
-    protected readonly List<T> historicStates = new();
-
     private readonly Dictionary<Type, Reducer> Reducers = new();
 
     public delegate T Reducer(T state, Action action);
 
     public delegate void Subscriber(PropertyInfo propertyInfo, object oldValue, object newValue);
-
-    protected bool KeepHistoricStates = false;
 
     public static StateStore<T> Instance { get; protected set; }
 
@@ -32,6 +28,7 @@ public abstract partial class StateStore<T> : Node
     private PropertyInfo[] CachedProperties;
 
     private readonly ConcurrentDictionary<PropertyInfo, Subscriber> Subscribers = new();
+    readonly List<ChangedProperty> changedProperties = new();
 
     public void Dispatch(Action action)
     {
@@ -45,10 +42,6 @@ public abstract partial class StateStore<T> : Node
         if (oldState == newState)
         {
             return;
-        }
-        if (KeepHistoricStates)
-        {
-            historicStates.Add(oldState);
         }
         NotifySubscribers(GetChangedValues(oldState, newState));
         CurrentState = newState;
@@ -69,11 +62,10 @@ public abstract partial class StateStore<T> : Node
         public object oldValue;
         public object newValue;
     }
-
-
     private List<ChangedProperty> GetChangedValues(T oldState, T newState)
     {
-        List<ChangedProperty> changedProperties = new();
+        changedProperties.Clear();
+
         CachedProperties ??= oldState.GetType().GetProperties();
         foreach (var prop in CachedProperties)
         {
@@ -130,23 +122,24 @@ public abstract partial class StateStore<T> : Node
     public void ConnectWiredAttributes(Node node, Subscriber subscriber = null)
     {
         var wiredProperties = from property in node.GetType().GetProperties()
-                              let attribute = property.GetCustomAttributes(typeof(WireToStateAttribute), true)
-                              where attribute.Length == 1
-                              select new { Info = property, Attribute = attribute[0] as WireToStateAttribute };
+                              let attributes = property.GetCustomAttributes(typeof(WireToStateAttribute), true)
+                              where attributes.Length == 1
+                              select new { Info = property, Attribute = attributes[0] as WireToStateAttribute };
 
-        foreach (var prop in wiredProperties)
+        foreach (var wiredProp in wiredProperties)
         {
-            var stateProperty = GetStatePropertyFromName(prop.Attribute.StatePropertyName);
+            var stateProperty = GetStatePropertyFromName(wiredProp.Attribute.StatePropertyName);
             var value = GetStateValue(stateProperty);
 
-            if (prop.Info.PropertyType != stateProperty.PropertyType)
+            if (wiredProp.Info.PropertyType != stateProperty.PropertyType)
             {
                 throw new Exception("Type of wired property does not match state property. Change the type or extend the state and update the reducer functions");
             }
 
-            SetNodesWithProperty(node, prop.Info, value, prop.Attribute.NodePath, prop.Attribute.NodeProperty);
+            SetNodesWithProperty(node, wiredProp.Info, value, wiredProp.Attribute.NodePath, wiredProp.Attribute.NodeProperty);
             // if the delegate is not provided/overrden - provide a default one
-            var _subscriber = subscriber ?? ((statePropertyInfo, oldValue, newValue) => SetNodesWithProperty(node, prop.Info, newValue, prop.Attribute.NodePath, prop.Attribute.NodeProperty));
+            var _subscriber = subscriber ?? ((statePropertyInfo, oldValue, newValue) => 
+            SetNodesWithProperty(node, wiredProp.Info, newValue, wiredProp.Attribute.NodePath, wiredProp.Attribute.NodeProperty));
             AddSubscriber(stateProperty, _subscriber);
         }
     }

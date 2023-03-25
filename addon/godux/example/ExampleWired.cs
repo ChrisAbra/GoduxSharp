@@ -36,6 +36,8 @@ public partial class ExampleWired : Control
         var newHeaderText = GetNode<TextEdit>("%TitleTextEditor").Text;
 
         AppState.Instance.Dispatch(new AppState.SetUndoableString(newHeaderText));
+        GetNode<TextEdit>("%TitleTextEditor").Text = "";
+
     }
     public void OnUndoTitle()
     {
