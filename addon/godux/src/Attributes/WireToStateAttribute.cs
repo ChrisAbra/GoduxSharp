@@ -20,7 +20,7 @@ public class WireToStateAttribute : Attribute
     }
     public WireToStateAttribute(string[] statePropertyPaths, string nodePath, string nodeProperty)
     {
-        this.StatePropertyName = string.Join(".",statePropertyPaths);
+        this.StatePropertyName = string.Join(".", statePropertyPaths);
         this.NodePath = nodePath;
         this.NodeProperty = nodeProperty;
     }

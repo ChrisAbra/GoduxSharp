@@ -80,12 +80,12 @@ public abstract partial class StateStore<T> : Node
             var oldValue = prop.GetValue(oldState);
             var newValue = prop.GetValue(newState);
 
-            dynamic newValueTyped = Convert.ChangeType(newValue,prop.PropertyType);
-            dynamic oldValueTyped = Convert.ChangeType(oldValue,prop.PropertyType);
+            dynamic newValueTyped = Convert.ChangeType(newValue, prop.PropertyType);
+            dynamic oldValueTyped = Convert.ChangeType(oldValue, prop.PropertyType);
 
             if (newValueTyped != oldValueTyped)
             {
-                GD.Print("+++ Changed:", prop.Name," - ", newValue);
+                GD.Print("+++ Changed:", prop.Name, " - ", newValue);
                 changedProperties.Add(new ChangedProperty { propertyInfo = prop, oldValue = oldValue, newValue = newValue });
             }
         }
@@ -107,11 +107,14 @@ public abstract partial class StateStore<T> : Node
     private PropertyInfo GetStatePropertyFromName(string propertyName)
     {
         PropertyInfo stateProperty = null;
-        foreach(string path in propertyName.Split(".")){
-            if(stateProperty is null){
+        foreach (string path in propertyName.Split("."))
+        {
+            if (stateProperty is null)
+            {
                 stateProperty = CurrentState.GetType().GetProperty(path);
             }
-            else {
+            else
+            {
                 stateProperty = stateProperty.PropertyType.GetProperty(path);
             }
         }

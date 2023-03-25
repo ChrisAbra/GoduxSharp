@@ -44,11 +44,12 @@ public partial class ExampleStateStore : Godux.StateStore<ExampleState>
         On(typeof(SetUndoableString), (state, action) =>
         {
             var setUndoableAction = action as SetUndoableString;
-            return state with { UndoableString = state.UndoableString.Set(setUndoableAction.NewValue)};
+            return state with { UndoableString = state.UndoableString.Set(setUndoableAction.NewValue) };
         });
-        On(typeof(SubStateUpdater), (state,action ) => {
+        On(typeof(SubStateUpdater), (state, action) =>
+        {
             var subStateUpdater = action as SubStateUpdater;
-            return state with {Substate = state.Substate with {SubstateValue = subStateUpdater.SubstateValue}};
+            return state with { Substate = state.Substate with { SubstateValue = subStateUpdater.SubstateValue } };
         });
     }
 }

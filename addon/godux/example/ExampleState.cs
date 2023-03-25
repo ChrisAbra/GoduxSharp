@@ -8,9 +8,9 @@ public record ExampleState : Godux.State
     public int Counter { get; init; } = 12;
     public string CounterString => Counter.ToString();
 
-    public UndoableState<string> UndoableString {get;init;} = "Undoable Header";
+    public UndoableState<string> UndoableString { get; init; } = "Undoable Header";
     public string UndoableStringPresent => UndoableString.Present;
 
-    public ExampleSubState Substate {get;init;} = new();
+    public ExampleSubState Substate { get; init; } = new() { SubstateValue = "Test substate" };
 
 }

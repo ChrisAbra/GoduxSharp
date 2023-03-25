@@ -8,12 +8,15 @@ public partial class ExampleWired : Control
     [WireToState(nameof(ExampleState.UndoableStringPresent), "%HeaderText", nameof(Label.Text))]
     public string HeaderText { get; set; }
 
-    [WireToState(new string[]{nameof(ExampleState.CounterString)}, "%Counter", nameof(Label.Text))]
+    [WireToState(new string[] { nameof(ExampleState.CounterString) }, "%Counter", nameof(Label.Text))]
     public string CounterStringValue
     {
         get => _counterStringValue;
-        set  {_counterStringValue = value;
-            CounterSet(value);}
+        set
+        {
+            _counterStringValue = value;
+            CounterSet(value);
+        }
     }
     private string _counterStringValue;
 
@@ -21,10 +24,10 @@ public partial class ExampleWired : Control
     {
         AppState.Instance.ConnectWiredAttributes(this);
         AppState.Instance.Dispatch(new AppState.SubStateUpdater("new Substate value"));
-
     }
 
-    public void CounterSet(string value){
+    public void CounterSet(string value)
+    {
         GD.Print("Counter Set with new value: ", value);
     }
 
