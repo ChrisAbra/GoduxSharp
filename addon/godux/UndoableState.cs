@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 namespace Godux;
 
-public record Undoable<T>
+public record UndoableState<T> : State
 where T : class
 {
-    private readonly List<T> past = new();//e.g [1,2,3,4]
+    private readonly List<T> past = new(); //e.g [1,2,3,4]
     public T Present { get; init; } // 5
     private readonly List<T> future = new(); //[6,7] 
 
@@ -17,21 +17,21 @@ where T : class
         return future.Count > 0;
     }
 
-    public Undoable(T value)
+    public UndoableState(T value)
     {
         Present = value;
     }
 
-    public Undoable<T> Undo()
+    public UndoableState<T> Undo()
     {
         if (!CanUndo()) return this;
 
-        var returnValue = this with { Present = past[-1] };
+        var returnValue = this with { Present = past.Last() };
         returnValue.future.Insert(0, Present);
         returnValue.past.RemoveAt(past.Count - 1);
         return returnValue ?? this;
     }
-    public Undoable<T> Set(T newValue)
+    public UndoableState<T> Set(T newValue)
     {
         var returnValue = this with { };
         returnValue.future.Clear();
@@ -39,7 +39,7 @@ where T : class
         return returnValue with { Present = newValue };
     }
 
-    public Undoable<T> Redo()
+    public UndoableState<T> Redo()
     {
         if (!CanRedo()) return this;
 
@@ -49,8 +49,8 @@ where T : class
         return returnValue;
     }
 
-    public static implicit operator Undoable<T>(T someValue)
+    public static implicit operator UndoableState<T>(T someValue)
     {
-        return new Undoable<T>(someValue);
+        return new UndoableState<T>(someValue);
     }
 }

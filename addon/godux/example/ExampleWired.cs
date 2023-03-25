@@ -1,6 +1,7 @@
 using Godot;
-using Godux;
-using AppState = ExampleStateStore;
+using AppState = Godux.Example.ExampleStateStore;
+
+namespace Godux.Example;
 public partial class ExampleWired : Control
 {
 
@@ -19,6 +20,8 @@ public partial class ExampleWired : Control
     public override void _Ready()
     {
         AppState.Instance.ConnectWiredAttributes(this);
+        AppState.Instance.Dispatch(new AppState.SubStateUpdater("new Substate value"));
+
     }
 
     public void CounterSet(string value){

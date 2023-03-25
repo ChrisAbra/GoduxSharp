@@ -1,16 +1,19 @@
 using System.Collections.Immutable;
 using Godot;
 
+namespace Godux.Example;
+
 public partial class ExampleStateStore : Godux.StateStore<ExampleState>
 {
     protected override string Path => "/root/AppState";
 
     public record ChangedHeaderText(string HeaderText) : Action;
-    public record IncrementCounter() : Action;
-    public record DecrementCounter() : Action;
-    public record UndoUndoableString() : Action;
-    public record RedoUndoableString() : Action;
+    public record IncrementCounter : Action;
+    public record DecrementCounter : Action;
+    public record UndoUndoableString : Action;
+    public record RedoUndoableString : Action;
     public record SetUndoableString(string NewValue) : Action;
+    public record SubStateUpdater(string SubstateValue) : Action;
 
     public ExampleStateStore()
     {
@@ -42,6 +45,10 @@ public partial class ExampleStateStore : Godux.StateStore<ExampleState>
         {
             var setUndoableAction = action as SetUndoableString;
             return state with { UndoableString = state.UndoableString.Set(setUndoableAction.NewValue)};
+        });
+        On(typeof(SubStateUpdater), (state,action ) => {
+            var subStateUpdater = action as SubStateUpdater;
+            return state with {Substate = state.Substate with {SubstateValue = subStateUpdater.SubstateValue}};
         });
     }
 }

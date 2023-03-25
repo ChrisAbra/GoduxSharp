@@ -1,11 +1,11 @@
 
 using System.Collections.Concurrent;
 using System.Reflection;
+using System.Collections;
 using Godot;
 
 namespace Godux;
 
-public abstract record State { }
 public abstract partial class StateStore<T> : Node
     where T : State
 {
@@ -59,7 +59,7 @@ public abstract partial class StateStore<T> : Node
         foreach (var prop in changedProperties)
         {
             Subscribers.TryGetValue(prop.propertyInfo, out Subscriber subscribers);
-            subscribers?.Invoke(prop.propertyInfo, prop.oldValue, prop.newValue);
+            Task.Run(() => subscribers?.Invoke(prop.propertyInfo, prop.oldValue, prop.newValue));
         }
     }
 
@@ -70,16 +70,22 @@ public abstract partial class StateStore<T> : Node
         public object newValue;
     }
 
+
     private List<ChangedProperty> GetChangedValues(T oldState, T newState)
     {
         List<ChangedProperty> changedProperties = new();
         CachedProperties ??= oldState.GetType().GetProperties();
         foreach (var prop in CachedProperties)
         {
-            object oldValue = prop.GetValue(oldState);
-            object newValue = prop.GetValue(newState);
-            if (oldValue != newValue)
+            var oldValue = prop.GetValue(oldState);
+            var newValue = prop.GetValue(newState);
+
+            dynamic newValueTyped = Convert.ChangeType(newValue,prop.PropertyType);
+            dynamic oldValueTyped = Convert.ChangeType(oldValue,prop.PropertyType);
+
+            if (newValueTyped != oldValueTyped)
             {
+                GD.Print("+++ Changed:", prop.Name," - ", newValue);
                 changedProperties.Add(new ChangedProperty { propertyInfo = prop, oldValue = oldValue, newValue = newValue });
             }
         }
