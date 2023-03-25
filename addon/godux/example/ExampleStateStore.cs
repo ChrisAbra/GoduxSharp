@@ -46,6 +46,7 @@ public partial class ExampleStateStore : Godux.StateStore<ExampleState>
             return state with { UndoableString = state.UndoableString.Set(setUndoableAction.NewValue) };
         });
 
+        //If splitting the class definition for easier control over substates you need to ensure those functions are called to add the Reducers
         AddPartialStateReducerFunctions();
     }
 
