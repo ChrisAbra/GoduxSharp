@@ -6,22 +6,17 @@ using Godux;
 
 public partial class PostContainer : VBoxContainer
 {
-	public ImmutableArray<PostItem> Posts {get => _posts;
-		set {
-			_posts = value;
-			RenderPosts();
-		}
-	}
+	[WireToState("Posts.Present.Posts")]
+	public ImmutableArray<PostItem> Posts {get;set;}
 
-	[WireToState]
-	public ImmutableArray<PostItem> Posts_Present_Post {get;set;}
 	[Export]
 	public PackedScene PostScene;
-	private ImmutableArray<PostItem> _posts;
 
 	public override void _Ready(){
-		AppState.Instance.AddSubscriber("Posts.Present.Posts", (prop, state, oldValue, newValue) => Posts = (ImmutableArray<PostItem>)newValue);
-		//AppState.Instance.ConnectWiredAttributes(this);
+		AppState.Instance.AddSubscriber("Posts.Present.Posts", (prop, state, oldValue, newValue) => {
+			Posts = (ImmutableArray<PostItem>)newValue;
+			RenderPosts();
+		});
 	}
 
 	public void RenderPosts(){

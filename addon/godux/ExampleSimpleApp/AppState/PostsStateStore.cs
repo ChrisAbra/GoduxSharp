@@ -1,4 +1,13 @@
+using System.Collections.Immutable;
 using Godux;
+
+public record PostItem {
+    public string Poster {get;init;}
+    public string PostText {get;init;}
+}
+public record PostsState : State {
+    public ImmutableArray<PostItem> Posts {get;init;} = ImmutableArray.Create<PostItem>();
+}
 
 public partial class PostingAppStateStore : StateStore<PostingAppState>
 {

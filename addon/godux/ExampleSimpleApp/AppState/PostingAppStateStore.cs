@@ -1,6 +1,13 @@
 using Godux;
 using Godot;
 
+public record PostingAppState : State {
+    public UndoableState<PostsState> Posts {get;init;} = new PostsState();
+
+    public int NumberOfPosts => Posts.Present.Posts.Length;
+
+}
+
 public partial class PostingAppStateStore : StateStore<PostingAppState>
 {
     public override void InitaliseState()

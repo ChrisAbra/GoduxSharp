@@ -9,7 +9,6 @@ public class WireToStateAttribute : Attribute
     public string NodePath { get; }
     public string NodeProperty { get; }
 
-    public WireToStateAttribute(){}
     public WireToStateAttribute(string statePropertyName)
     {
         this.StatePropertyName = statePropertyName;
