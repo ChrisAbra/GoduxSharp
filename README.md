@@ -112,6 +112,11 @@ By defining your Store class as partial, it means you can divide SubState blocks
 
 ```csharp
 //Primary file should contain the Reduce method
+public record PostingAppState : State {
+    public UndoableState<PostsState> Posts {get;init;} = new PostsState();
+    public string PosterName {get;init;} = "Name not set";
+}
+
 public partial class PostingAppStateStore : StateStore<PostingAppState>
 {
     protected override PostingAppState Reduce(PostingAppState state, Godux.Action action)
@@ -130,6 +135,13 @@ public partial class PostingAppStateStore : StateStore<PostingAppState>
     }
 }
 //Different File
+public record PostItem {
+    public string Poster {get;init;}
+    public string PostText {get;init;}
+}
+public record PostsState : State {
+    public ImmutableArray<PostItem> Posts {get;init;} = ImmutableArray.Create<PostItem>();
+}
 public partial class PostingAppStateStore : StateStore<PostingAppState>
 {
     public record PostAction : Godux.Action;
