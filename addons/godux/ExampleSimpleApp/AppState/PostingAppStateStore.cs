@@ -1,9 +1,10 @@
 using Godux;
 using Godot;
 
-public record PostingAppState : State {
-    public UndoableState<PostsState> Posts {get;init;} = new PostsState();
-    public string PosterName {get;init;} = "Name not set";
+public record PostingAppState : State
+{
+    public UndoableState<PostsState> Posts { get; init; } = new PostsState();
+    public string PosterName { get; init; } = "Name not set";
     public int NumberOfPosts => Posts.Present.Posts.Length;
 
 }
@@ -23,9 +24,9 @@ public partial class PostingAppStateStore : StateStore<PostingAppState>
     {
         return action switch
         {
-            SetPosterName setPosterName => state with {PosterName = setPosterName.PosterName},
-            UndoPost _ => state with {Posts = state.Posts.Undo()},
-            RedoPost _ => state with {Posts = state.Posts.Redo()},
+            SetPosterName setPosterName => state with { PosterName = setPosterName.PosterName },
+            UndoPost _ => state with { Posts = state.Posts.Undo() },
+            RedoPost _ => state with { Posts = state.Posts.Redo() },
             MakePost makePost => state with
             {
                 Posts = state.Posts.Set(Reduce_PostAction(state.Posts.Present, makePost))

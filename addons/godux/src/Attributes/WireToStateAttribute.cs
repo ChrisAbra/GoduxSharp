@@ -5,7 +5,7 @@ namespace Godux;
 public class WireToStateAttribute : Attribute
 {
     public string StatePropertyName { get; }
-    public string SubstateName {get;}
+    public string SubstateName { get; }
     public string NodePath { get; }
     public string NodeProperty { get; }
 

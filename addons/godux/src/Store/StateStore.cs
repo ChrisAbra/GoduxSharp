@@ -18,7 +18,8 @@ public abstract partial class StateStore<T> : Node
     protected virtual string Path => "/root/AppState";
     public abstract void InitalizeState();
 
-    public override void _Ready(){
+    public override void _Ready()
+    {
         Instance = this.GetNode<StateStore<T>>(Path);
         InitalizeState();
     }
@@ -81,7 +82,8 @@ public abstract partial class StateStore<T> : Node
             }
         }
 
-        if(stateProperty == null){
+        if (stateProperty == null)
+        {
             throw new Exception($"Property not found for '{propertyName}'. Check the property name is correct and that the property on the state is not a field instead");
         }
 
@@ -112,10 +114,12 @@ public abstract partial class StateStore<T> : Node
 
             SetNodesWithProperty(node, wiredProp.Info, value, wiredProp.Attribute.NodePath, wiredProp.Attribute.NodeProperty);
 
-            void DefaultWiredSubscriber(PropertyInfo statePropertyInfo, State state, object _, object newValue){
-                if(wiredProp.Attribute?.SubstateName != null){
+            void DefaultWiredSubscriber(PropertyInfo statePropertyInfo, State state, object _, object newValue)
+            {
+                if (wiredProp.Attribute?.SubstateName != null)
+                {
                     Type substateType = Type.GetType(wiredProp.Attribute.SubstateName);
-                    if(!substateType.IsAssignableFrom(state.GetType())) return; // Where the state doesnt match the expected type ignore.
+                    if (!substateType.IsAssignableFrom(state.GetType())) return; // Where the state doesnt match the expected type ignore.
                 }
                 SetNodesWithProperty(node, wiredProp.Info, newValue, wiredProp.Attribute.NodePath, wiredProp.Attribute.NodeProperty);
             }

@@ -27,7 +27,8 @@ public record UndoableState<T> : State
     }
     public UndoableState<T> Set(T newValue)
     {
-        if(EqualityComparer<T>.Default.Equals(newValue,Present)){
+        if (EqualityComparer<T>.Default.Equals(newValue, Present))
+        {
             return this;
         }
         var returnValue = this with { };

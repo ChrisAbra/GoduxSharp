@@ -15,10 +15,10 @@ public partial class PostingApp : Control
             GetNode<Label>("%NumPosts").Text = $"Number of Posts: {numPosts}";
         }
     }
-	private int numPosts;
+    private int numPosts;
 
-    [WireToState("PosterName","%NameLabel",nameof(Label.Text))]
-    public string PosterName {get;set;}
+    [WireToState("PosterName", "%NameLabel", nameof(Label.Text))]
+    public string PosterName { get; set; }
 
     public override void _Ready()
     {

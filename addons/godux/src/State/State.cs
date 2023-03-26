@@ -26,16 +26,18 @@ public abstract record State
             var oldValue = prop.GetValue(oldState);
             var newValue = prop.GetValue(this);
 
-            if(newValue is State substate){
+            if (newValue is State substate)
+            {
                 changedProperties.AddRange(substate.GetChangedValues(oldValue as State));
             }
-            else{
+            else
+            {
                 dynamic newValueTyped = Convert.ChangeType(newValue, prop.PropertyType);
                 dynamic oldValueTyped = Convert.ChangeType(oldValue, prop.PropertyType);
 
                 if (newValueTyped != oldValueTyped)
                 {
-                    changedProperties.Add(new ChangedProperty { state= this, propertyInfo = prop, oldValue = oldValue, newValue = newValue });
+                    changedProperties.Add(new ChangedProperty { state = this, propertyInfo = prop, oldValue = oldValue, newValue = newValue });
                 }
             }
         }
