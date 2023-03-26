@@ -99,3 +99,52 @@ It has 3 overloads:
     public string PlayerName {get;set;}
     ```
 Obviously it's better to use nameof where possible but there is no nice way for significantly nested state.
+
+
+## Undoable
+There is a builtin `Undoable<T>` class which is a type of State which has the functions for Undo and Redo built in. This works slightly differently from the standard `state with {Property = newValue}` reducer and instead should call the Set() method on any undoable properties - this returns a copy of the undoable state such as `state with {UndoableProperty.Set(newValue)}`
+
+Similarly state can be rewound and redone by calling the Undo and Redo methods in a reducer such as `state with {UndoableProperty.Undo()}`
+
+## Code Splitting / Partial classes
+
+By defining your Store class as partial, it means you can divide SubState blocks into different files
+
+```csharp
+//Primary file should contain the Reduce method
+public partial class PostingAppStateStore : StateStore<PostingAppState>
+{
+    protected override PostingAppState Reduce(PostingAppState state, Godux.Action action)
+    {
+        return action switch
+        {
+            SetPosterName setPosterName => state with {PosterName = setPosterName.PosterName},
+            UndoPost _ => state with {Posts = state.Posts.Undo()},
+            RedoPost _ => state with {Posts = state.Posts.Redo()},
+            MakePost makePost => state with
+            {
+                Posts = state.Posts.Set(Reduce_PostAction(state.Posts.Present, makePost))
+            },
+            _ => state
+        };
+    }
+}
+//Different File
+public partial class PostingAppStateStore : StateStore<PostingAppState>
+{
+    public record PostAction : Godux.Action;
+    public record MakePost(PostItem postItem) : PostAction;
+
+    protected PostsState Reduce_PostAction(PostsState postsState, PostAction postAction)
+    {
+        return postAction switch
+        {
+            MakePost makePost => postsState with
+            {
+                Posts = postsState.Posts.Add(makePost.postItem),
+            },
+            _ => postsState
+        };
+    }
+}
+```
