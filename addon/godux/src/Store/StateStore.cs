@@ -16,11 +16,11 @@ public abstract partial class StateStore<T> : Node
     public static StateStore<T> Instance { get; protected set; }
 
     protected virtual string Path => "/root/AppState";
-    public abstract void InitaliseState();
+    public abstract void InitalizeState();
 
     public override void _Ready(){
         Instance = this.GetNode<StateStore<T>>(Path);
-        InitaliseState();
+        InitalizeState();
     }
 
     protected abstract T Reduce(T state, Action action);
@@ -71,7 +71,6 @@ public abstract partial class StateStore<T> : Node
         PropertyInfo stateProperty = null;
         foreach (string path in propertyName.Split("."))
         {
-            GD.Print("Path: ", path);
             if (stateProperty is null)
             {
                 stateProperty = CurrentState.GetType().GetProperty(path);
@@ -111,6 +110,7 @@ public abstract partial class StateStore<T> : Node
                 throw new Exception("Type of wired property does not match state property. Change the type or extend the state and update the reducer functions");
             }
 
+            SetNodesWithProperty(node, wiredProp.Info, value, wiredProp.Attribute.NodePath, wiredProp.Attribute.NodeProperty);
 
             void DefaultWiredSubscriber(PropertyInfo statePropertyInfo, State state, object _, object newValue){
                 if(wiredProp.Attribute?.SubstateName != null){

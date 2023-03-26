@@ -34,6 +34,27 @@ offset_bottom = -30.0
 grow_horizontal = 2
 grow_vertical = 2
 
+[node name="NameDisplay" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="Pretext" type="Label" parent="Panel/VBoxContainer/NameDisplay"]
+layout_mode = 2
+text = "Name:"
+
+[node name="NameLabel" type="Label" parent="Panel/VBoxContainer/NameDisplay"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="NameSetter" parent="Panel/VBoxContainer" instance=ExtResource("2_txnyg")]
+layout_mode = 2
+UpdateType = 1
+
+[node name="TextEditor" parent="Panel/VBoxContainer/NameSetter" index="0"]
+placeholder_text = "Enter name here"
+
+[node name="Post" parent="Panel/VBoxContainer/NameSetter" index="1"]
+text = "     Update Name     "
+
 [node name="NumPosts" type="Label" parent="Panel/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -68,3 +89,5 @@ layout_mode = 2
 
 [connection signal="pressed" from="Panel/VBoxContainer/HBoxContainer/Undo" to="." method="Undo"]
 [connection signal="pressed" from="Panel/VBoxContainer/HBoxContainer/Redo" to="." method="Redo"]
+
+[editable path="Panel/VBoxContainer/NameSetter"]

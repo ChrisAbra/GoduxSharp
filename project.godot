@@ -21,7 +21,7 @@ AppState="*res://addon/godux/ExampleSimpleApp/AppState/PostingAppStateStore.cs"
 
 [display]
 
-window/stretch/scale=2.0
+window/stretch/scale=1.4
 
 [dotnet]
 

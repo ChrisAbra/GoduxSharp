@@ -17,6 +17,9 @@ public partial class PostingApp : Control
     }
 	private int numPosts;
 
+    [WireToState("PosterName","%NameLabel",nameof(Label.Text))]
+    public string PosterName {get;set;}
+
     public override void _Ready()
     {
         AppState.Instance.ConnectWiredAttributes(this);
