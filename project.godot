@@ -13,6 +13,8 @@ config_version=5
 config/name="Godux"
 run/main_scene="res://addon/godux/ExampleSimpleApp/PostingApp.tscn"
 config/features=PackedStringArray("4.0", "C#", "Forward Plus")
+run/low_processor_mode=true
+boot_splash/show_image=false
 config/icon="res://icon.svg"
 
 [autoload]
