@@ -10,7 +10,7 @@ config_version=5
 
 [application]
 
-config/name="Redux"
+config/name="Godux"
 run/main_scene="res://addon/godux/ExampleSimpleApp/PostingApp.tscn"
 config/features=PackedStringArray("4.0", "C#", "Forward Plus")
 config/icon="res://icon.svg"
@@ -25,4 +25,4 @@ window/stretch/scale=1.4
 
 [dotnet]
 
-project/assembly_name="Redux"
+project/assembly_name="Godux"
