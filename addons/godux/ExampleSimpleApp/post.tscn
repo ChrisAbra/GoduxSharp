@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b7etnuyamx210"]
 
-[ext_resource type="Script" path="res://addon/godux/ExampleSimpleApp/Post.cs" id="1_xr2ro"]
+[ext_resource type="Script" path="res://addons/godux/ExampleSimpleApp/Post.cs" id="1_xr2ro"]
 
 [node name="Post" type="Panel"]
 custom_minimum_size = Vector2(2.08165e-12, 50)

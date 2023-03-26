@@ -1,9 +1,10 @@
-[gd_scene load_steps=5 format=3 uid="uid://dmy78wkebrmmd"]
+[gd_scene load_steps=6 format=3 uid="uid://dmy78wkebrmmd"]
 
-[ext_resource type="Script" path="res://addon/godux/ExampleSimpleApp/PostContainer.cs" id="1_i6d4y"]
-[ext_resource type="PackedScene" uid="uid://b7etnuyamx210" path="res://addon/godux/ExampleSimpleApp/post.tscn" id="1_msxyi"]
-[ext_resource type="Script" path="res://addon/godux/ExampleSimpleApp/PostingApp.cs" id="1_xtvia"]
-[ext_resource type="PackedScene" uid="uid://cbid8ny65mug6" path="res://addon/godux/ExampleSimpleApp/poster.tscn" id="2_txnyg"]
+[ext_resource type="Script" path="res://addons/godux/ExampleSimpleApp/PostContainer.cs" id="1_i6d4y"]
+[ext_resource type="PackedScene" uid="uid://b7etnuyamx210" path="res://addons/godux/ExampleSimpleApp/post.tscn" id="1_msxyi"]
+[ext_resource type="Script" path="res://addons/godux/ExampleSimpleApp/PostingApp.cs" id="1_xtvia"]
+[ext_resource type="Script" path="res://addons/godux/src/Nodes/WireToState.cs" id="2_h6pal"]
+[ext_resource type="PackedScene" uid="uid://cbid8ny65mug6" path="res://addons/godux/ExampleSimpleApp/poster.tscn" id="2_txnyg"]
 
 [node name="PostingApp" type="Control"]
 layout_mode = 3
@@ -45,6 +46,11 @@ text = "Name:"
 unique_name_in_owner = true
 layout_mode = 2
 
+[node name="WireToState" type="Node" parent="Panel/VBoxContainer/NameDisplay/NameLabel"]
+script = ExtResource("2_h6pal")
+TargetProperty = "Text"
+StatePropertyPath = "PosterName"
+
 [node name="NameSetter" parent="Panel/VBoxContainer" instance=ExtResource("2_txnyg")]
 layout_mode = 2
 UpdateType = 1
@@ -55,10 +61,22 @@ placeholder_text = "Enter name here"
 [node name="Post" parent="Panel/VBoxContainer/NameSetter" index="1"]
 text = "     Update Name     "
 
-[node name="NumPosts" type="Label" parent="Panel/VBoxContainer"]
+[node name="NumberOfPosts" type="HBoxContainer" parent="Panel/VBoxContainer"]
+layout_mode = 2
+
+[node name="NumPostsPretext" type="Label" parent="Panel/VBoxContainer/NumberOfPosts"]
+layout_mode = 2
+text = "Number of Posts:"
+
+[node name="NumPosts" type="Label" parent="Panel/VBoxContainer/NumberOfPosts"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "Number of Posts: 0"
+text = "0"
+
+[node name="WireToState" type="Node" parent="Panel/VBoxContainer/NumberOfPosts/NumPosts"]
+script = ExtResource("2_h6pal")
+TargetProperty = "Text"
+StatePropertyPath = "NumberOfPosts"
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer"]
 layout_mode = 2

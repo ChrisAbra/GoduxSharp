@@ -1,12 +1,10 @@
 using Godot;
 using System;
 using System.Collections.Immutable;
-using AppState = PostingAppStateStore;
 using Godux;
 
 public partial class PostContainer : VBoxContainer
 {
-    [WireToState("Posts.Present.Posts")]
     public ImmutableArray<PostItem> Posts { get; set; }
 
     [Export]
@@ -14,7 +12,7 @@ public partial class PostContainer : VBoxContainer
 
     public override void _Ready()
     {
-        AppState.Instance.AddSubscriber("Posts.Present.Posts", (prop, state, oldValue, newValue) =>
+        AppState.Store?.AddSubscriber("Posts.Present.Posts", (prop, state, oldValue, newValue) =>
         {
             Posts = (ImmutableArray<PostItem>)newValue;
             RenderPosts();

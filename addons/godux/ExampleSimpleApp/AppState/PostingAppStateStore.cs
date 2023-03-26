@@ -1,19 +1,24 @@
 using Godux;
 using Godot;
 
+public record PostingAppSubState : State
+{
+    public string PosterName { get; init; } = "Substate name";
+}
 public record PostingAppState : State
 {
     public UndoableState<PostsState> Posts { get; init; } = new PostsState();
+
     public string PosterName { get; init; } = "Name not set";
     public int NumberOfPosts => Posts.Present.Posts.Length;
-
+    public PostingAppSubState SubState { get; init; }
 }
 
 public partial class PostingAppStateStore : StateStore<PostingAppState>
 {
     public override void InitalizeState()
     {
-        CurrentState = new PostingAppState();
+        CurrentState = new ();
     }
 
     public record UndoPost : Godux.Action;

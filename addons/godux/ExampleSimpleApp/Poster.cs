@@ -1,6 +1,7 @@
 using Godot;
 using System;
-using AppState = PostingAppStateStore;
+using Godux;
+using static PostingAppStateStore;
 
 public partial class Poster : Control
 {
@@ -12,17 +13,19 @@ public partial class Poster : Control
 
     [Export]
     public PosterUpdateType UpdateType;
+
+    public string PosterName {get;set;}
     public void PressPost()
     {
         string enteredText = GetNode<TextEdit>("%TextEditor").Text;
         if (UpdateType == PosterUpdateType.POST)
         {
-            var postItem = new PostItem { PostText = enteredText, Poster = AppState.Instance.CurrentState.PosterName };
-            AppState.Instance.Dispatch(new AppState.MakePost(postItem));
+            var postItem = new PostItem { PostText = enteredText, Poster = PosterName};
+            AppState.Store?.Dispatch(new MakePost(postItem));
         }
         if (UpdateType == PosterUpdateType.POSTER)
         {
-            AppState.Instance.Dispatch(new AppState.SetPosterName(enteredText));
+            AppState.Store?.Dispatch(new SetPosterName(enteredText));
         }
         GetNode<TextEdit>("%TextEditor").Text = "";
     }

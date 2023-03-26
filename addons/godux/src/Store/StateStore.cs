@@ -6,29 +6,47 @@ using Godot;
 
 namespace Godux;
 
-public abstract partial class StateStore<T> : Node
+public static class AppState {
+    public static StateStore Store {get;set;}
+}
+public abstract partial class StateStore: Node {
+    public abstract PropertyInfo GetStatePropertyFromName(string propertyName);
+    public abstract object GetStateValue(PropertyInfo propertyInfo);
+    public delegate void SubscriberObject(PropertyInfo propertyInfo, State state, object oldValue, object newValue);
+
+    public abstract void Dispatch(Action action);
+    public abstract void ConnectWiredAttributes(Node node, SubscriberObject subscriber = null);
+    protected virtual string Path => "/root/AppState";
+    public abstract void AddSubscriber(string propertyFullPath, SubscriberObject newSubscriber);
+    public abstract void AddSubscriber(PropertyInfo propertyInfo, SubscriberObject newSubscriber);
+
+}
+
+public abstract partial class StateStore<T> : StateStore
     where T : State
 {
     public T CurrentState { get; protected set; }
 
-    public delegate void SubscriberObject(PropertyInfo propertyInfo, State state, object oldValue, object newValue);
-
     public static StateStore<T> Instance { get; protected set; }
 
-    protected virtual string Path => "/root/AppState";
     public abstract void InitalizeState();
 
     public override void _Ready()
     {
-        Instance = this.GetNode<StateStore<T>>(Path);
         InitalizeState();
+        Instance = GetInstance(); // Typed 
+        AppState.Store = Instance; // Base
+    }
+
+    public StateStore<T> GetInstance(){
+        return this.GetNode<StateStore<T>>(Path);
     }
 
     protected abstract T Reduce(T state, Action action);
 
     private readonly ConcurrentDictionary<PropertyInfo, SubscriberObject> Subscribers = new();
 
-    public void Dispatch(Action action)
+    public override void Dispatch(Action action)
     {
         var newState = Reduce(CurrentState, action);
         HandleStateUpdate(CurrentState, newState);
@@ -54,20 +72,20 @@ public abstract partial class StateStore<T> : Node
             subscribers?.Invoke(prop.propertyInfo, prop.state, prop.oldValue, prop.newValue);
         }
     }
-    public void AddSubscriber(string propertyFullPath, SubscriberObject newSubscriber)
+    public override void AddSubscriber(string propertyFullPath, SubscriberObject newSubscriber)
     {
         var propertyInfo = GetStatePropertyFromName(propertyFullPath);
         AddSubscriber(propertyInfo, newSubscriber);
     }
 
-    public void AddSubscriber(PropertyInfo propertyInfo, SubscriberObject newSubscriber)
+    public override void AddSubscriber(PropertyInfo propertyInfo, SubscriberObject newSubscriber)
     {
         Subscribers.TryGetValue(propertyInfo, out SubscriberObject existingSubscribers);
         existingSubscribers += newSubscriber;
         Subscribers.TryAdd(propertyInfo, existingSubscribers);
     }
 
-    private PropertyInfo GetStatePropertyFromName(string propertyName)
+    public override PropertyInfo GetStatePropertyFromName(string propertyName)
     {
         PropertyInfo stateProperty = null;
         foreach (string path in propertyName.Split("."))
@@ -90,12 +108,12 @@ public abstract partial class StateStore<T> : Node
         return stateProperty;
     }
 
-    private object GetStateValue(PropertyInfo propertyInfo)
+    public override object GetStateValue(PropertyInfo propertyInfo)
     {
         return propertyInfo?.GetValue(CurrentState);
     }
 
-    public void ConnectWiredAttributes(Node node, SubscriberObject subscriber = null)
+    public override void ConnectWiredAttributes(Node node, SubscriberObject subscriber = null)
     {
         var wiredProperties = from property in node.GetType().GetProperties()
                               let attributes = property.GetCustomAttributes(typeof(WireToStateAttribute), true)

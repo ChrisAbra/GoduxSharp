@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://cbid8ny65mug6"]
+[gd_scene load_steps=3 format=3 uid="uid://cbid8ny65mug6"]
 
-[ext_resource type="Script" path="res://addon/godux/ExampleSimpleApp/Poster.cs" id="1_1wqg5"]
+[ext_resource type="Script" path="res://addons/godux/ExampleSimpleApp/Poster.cs" id="1_1wqg5"]
+[ext_resource type="Script" path="res://addons/godux/src/Nodes/WireToState.cs" id="2_0g2nr"]
 
 [node name="Poster" type="HBoxContainer"]
 anchors_preset = -1
@@ -19,5 +20,10 @@ size_flags_horizontal = 3
 [node name="Post" type="Button" parent="."]
 layout_mode = 2
 text = "     Post     "
+
+[node name="WireToState" type="Node" parent="."]
+script = ExtResource("2_0g2nr")
+TargetProperty = "PosterName"
+StatePropertyPath = "PosterName"
 
 [connection signal="pressed" from="Post" to="." method="PressPost"]

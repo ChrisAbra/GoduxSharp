@@ -1,11 +1,10 @@
 using Godot;
 using System;
 using Godux;
-using AppState = PostingAppStateStore;
+using static PostingAppStateStore;
 
 public partial class PostingApp : Control
 {
-    [WireToState("NumberOfPosts")]
     public int NumberOfPosts
     {
         get => numPosts;
@@ -17,20 +16,17 @@ public partial class PostingApp : Control
     }
     private int numPosts;
 
-    [WireToState("PosterName", "%NameLabel", nameof(Label.Text))]
-    public string PosterName { get; set; }
-
     public override void _Ready()
     {
-        AppState.Instance.ConnectWiredAttributes(this);
+        AppState.Store?.ConnectWiredAttributes(this);
     }
     private int _numPosts;
     public void Undo()
     {
-        AppState.Instance.Dispatch(new AppState.UndoPost());
+        AppState.Store?.Dispatch(new UndoPost());
     }
     public void Redo()
     {
-        AppState.Instance.Dispatch(new AppState.RedoPost());
+        AppState.Store?.Dispatch(new RedoPost());
     }
 }

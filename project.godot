@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="Godux"
-run/main_scene="res://addon/godux/ExampleSimpleApp/PostingApp.tscn"
+run/main_scene="res://addons/godux/ExampleSimpleApp/PostingApp.tscn"
 config/features=PackedStringArray("4.0", "C#", "Forward Plus")
 run/low_processor_mode=true
 boot_splash/show_image=false
@@ -19,7 +19,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
-AppState="*res://addon/godux/ExampleSimpleApp/AppState/PostingAppStateStore.cs"
+AppState="*res://addons/godux/ExampleSimpleApp/AppState/PostingAppStateStore.cs"
 
 [display]
 
@@ -28,3 +28,7 @@ window/stretch/scale=1.4
 [dotnet]
 
 project/assembly_name="Godux"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godux/plugin.cfg")

@@ -1,6 +1,6 @@
 ﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Godux", "Godux.csproj", "{C644C5C8-07C2-4E8D-A348-E36450160276}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Godux", "Godux.csproj", "{A960E527-9752-4A88-AC37-F0FDCDAD29B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -9,11 +9,11 @@ Global
 	ExportRelease|Any CPU = ExportRelease|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{C644C5C8-07C2-4E8D-A348-E36450160276}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C644C5C8-07C2-4E8D-A348-E36450160276}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C644C5C8-07C2-4E8D-A348-E36450160276}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
-		{C644C5C8-07C2-4E8D-A348-E36450160276}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
-		{C644C5C8-07C2-4E8D-A348-E36450160276}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
-		{C644C5C8-07C2-4E8D-A348-E36450160276}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
+		{A960E527-9752-4A88-AC37-F0FDCDAD29B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A960E527-9752-4A88-AC37-F0FDCDAD29B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A960E527-9752-4A88-AC37-F0FDCDAD29B5}.ExportDebug|Any CPU.ActiveCfg = ExportDebug|Any CPU
+		{A960E527-9752-4A88-AC37-F0FDCDAD29B5}.ExportDebug|Any CPU.Build.0 = ExportDebug|Any CPU
+		{A960E527-9752-4A88-AC37-F0FDCDAD29B5}.ExportRelease|Any CPU.ActiveCfg = ExportRelease|Any CPU
+		{A960E527-9752-4A88-AC37-F0FDCDAD29B5}.ExportRelease|Any CPU.Build.0 = ExportRelease|Any CPU
 	EndGlobalSection
 EndGlobal
