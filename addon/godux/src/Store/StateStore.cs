@@ -61,9 +61,14 @@ public abstract partial class StateStore<T> : Node
 
     public void AddSubscriber(PropertyInfo propertyInfo, Subscriber newSubscriber)
     {
-        Subscribers.TryGetValue(propertyInfo, out Subscriber existingSubscribers);
-        existingSubscribers += newSubscriber;
-        Subscribers.TryAdd(propertyInfo, existingSubscribers);
+        // if there is already a subscription list for this property, then add the new subscriber to it
+        if (Subscribers.TryGetValue(propertyInfo, out Subscriber existingSubscribers))
+        {
+            Subscribers.TryUpdate(propertyInfo, (existingSubscribers + newSubscriber), existingSubscribers);
+            return;
+        }
+        // otherwise extablish the new subscription list for this property
+        Subscribers.TryAdd(propertyInfo, newSubscriber);
     }
 
     private PropertyInfo GetStatePropertyFromName(string propertyName)
